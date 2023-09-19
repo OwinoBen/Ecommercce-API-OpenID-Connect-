@@ -73,10 +73,11 @@ jobs:
           name: Uploading to DockerHub
           command: |
             docker-compose -f docker-compose.prod.yml up -d --build
-            docker tag ecommerce-backend:latest "$DOCKERHUB_USERNAME"/savannah:latest
+            docker tag savannah:latest "$DOCKERHUB_USERNAME"/savannah:latest
             docker tag project_nginx:latest "$DOCKERHUB_USERNAME"/project_nginx:latest
             docker push $DOCKERHUB_USERNAME/savannah:latest
             docker push $DOCKERHUB_USERNAME/project_nginx:latest
+            
 
   pull-and-test-dockerhub-image:
     docker:
