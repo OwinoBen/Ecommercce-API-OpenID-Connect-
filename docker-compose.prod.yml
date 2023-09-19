@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   web:
-    image: 535793255376.dkr.ecr.us-east-1.amazonaws.com/savannah:latest
+    image: 535793255376.dkr.ecr.us-east-1.amazonaws.com/customer-order:latest
     container_name: savannah-api
     build:
       context: .
