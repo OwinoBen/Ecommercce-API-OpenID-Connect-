@@ -12,7 +12,7 @@ RUN pip install --upgrade pip
 COPY . .
 # install dependencies
 COPY ./requirements.txt .
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /ecommerce_api/wheels -r requirements.txt
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /savannah_api/wheels -r requirements.txt
 
 FROM python:3.9.6-alpine
 
@@ -34,8 +34,8 @@ WORKDIR $APP_HOME
 
 #install dependencies
 RUN apk update && apk add libpq #c library for connecting to postgresql
-COPY --from=builder /ecommerce_api/wheels /wheels
-COPY --from=builder /ecommerce_api/requirements.txt .
+COPY --from=builder /savannah_api/wheels /wheels
+COPY --from=builder /savannah_api/requirements.txt .
 RUN pip install --no-cache /wheels/*
 
 #copy entrypoint.sh
