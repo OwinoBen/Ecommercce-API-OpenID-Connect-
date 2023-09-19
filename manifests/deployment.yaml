@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: savannah
+  namespace: savannah
+  labels:
+    app: savannah
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: savannah
+  template:
+    metadata:
+      labels:
+        app: savannah
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+        - name: backend-api
+          image: savannah:latest
+          ports:
+            - name: gunicorn
+              containerPort: 8000
+        - name: ngnix
+          image: savanah-nginx:latest
+          ports:
+            - name: server
+              containerPort: 1337
