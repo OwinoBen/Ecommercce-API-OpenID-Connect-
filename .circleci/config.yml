@@ -1,0 +1,120 @@
+version: 2.1
+
+jobs:
+  create-docker-image:
+    docker:
+      - image: cimg/python:3.10.1
+    steps:
+      - checkout
+      - restore_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+      - run:
+          name: Installing dependencies
+          command: pip install -r requirements.txt
+      - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+          paths:
+            - "venv"
+      - run:
+          name: Installing docker compose
+          environment:
+            COMPOSE_VERSION: '1.29.2'
+          command:  |
+            curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_caching: true
+      - run:
+          name: Setting up docker
+          command: |
+            docker-compose -f docker-compose.prod.yml build
+
+  test-and-lint:
+    docker:
+      - image: cimg/python:3.10.1
+    steps:
+      - checkout
+      - run:
+          name: Initializing docker compose
+          command: |
+            curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_caching: true
+      - run:
+          name: Setting up docker
+          command: |
+            docker-compose -f docker-compose.prod.yml up -d --build
+      - run:
+          name: running tests
+          command: docker-compose -f docker-compose.prod.yml exec web python manage.py test
+
+  build-and-push-to-dockerhub:
+    docker:
+      - image: cimg/python:3.10.1
+    steps:
+      - checkout
+      - run:
+          name: Initializing docker compose
+          command: |
+            curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_caching: true
+      - run: |
+          echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
+      - run:
+          name: Uploading to DockerHub
+          command: |
+            docker-compose -f docker-compose.prod.yml up -d --build
+            docker tag ecommerce-backend:latest "$DOCKERHUB_USERNAME"/savannah:latest
+            docker tag project_nginx:latest "$DOCKERHUB_USERNAME"/project_nginx:latest
+            docker push $DOCKERHUB_USERNAME/savannah:latest
+            docker push $DOCKERHUB_USERNAME/project_nginx:latest
+
+  pull-and-test-dockerhub-image:
+    docker:
+      - image: cimg/python:3.10.1
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_catching: true
+      - run: |
+          echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
+      - run:
+          name: Pulling dockerhub images
+          command: |
+            docker pull $DOCKERHUB_USERNAME/savannah:latest
+            docker pull $DOCKERHUB_USERNAME/project_nginx:latest
+      - run:
+          name: Testing DockerHub images
+          no_output_timeout: 30m
+          command: |
+            docker-compose -f docker-compose.prod.yml up -d
+            docker exec -it ecommerce-api python manage.py test
+
+workflows:
+  build-and-test-workflow:
+    jobs:
+      - create-docker-image:
+          context: Docker-create
+          filters:
+            branches:
+              only:
+                - main
+      - test-and-lint:
+          requires:
+            - create-docker-image
+      - build-and-push-to-dockerhub:
+          requires:
+            - test-and-lint
+      - pull-and-test-dockerhub-image:
+          requires:
+            - build-and-push-to-dockerhub

@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  api:
+    image: backend
+    container_name: savannah-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/usr/src/app/
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+    links:
+      - db:db
+    networks:
+      - savannah
+
+  db:
+    image: postgres:13
+    container_name: api-db
+    restart: always
+    volumes:
+      - database-data:/var/lib/mysql/data/
+    environment:
+      POSTGRES_USER: opondoben
+      POSTGRES_PASSWORD: Savanah123
+      POSTGRES_DB: savanah_db
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    networks:
+      - savannah
+volumes:
+  database-data:
+networks:
+  savannah:
