@@ -68,7 +68,7 @@ jobs:
           version: 19.03.13
           docker_layer_caching: true
       - run:
-          name: Authenticate with AWS ECR
+          name: Authenticate with AWS ECR and DOCKERHUB
           command: |
             pip install awscli
             echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
@@ -85,7 +85,8 @@ jobs:
             docker push $DOCKERHUB_USERNAME/project_nginx:latest
       - run:
           name: Push docker images to ECR
-          command: docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/customer-order:latest
+          command: docker-compose -f docker-compose.prod.yml push
+#          command: docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/customer-order:latest
             
             
 
