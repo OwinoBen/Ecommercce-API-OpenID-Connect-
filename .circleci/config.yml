@@ -73,14 +73,14 @@ jobs:
               aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - run:
           name: Build and tag docker images
-          command: |
-            docker-compose -f docker-compose.prod.yml up -d --build
-            docker tag savannah:latest "$DOCKERHUB_USERNAME"/savannah:latest
-            docker tag project_nginx:latest "$DOCKERHUB_USERNAME"/project_nginx:latest
-            docker tag savannah:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/savannah:latest
-            docker tag project_nginx:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/project_nginx:latest
-            docker push $DOCKERHUB_USERNAME/savannah:latest
-            docker push $DOCKERHUB_USERNAME/project_nginx:latest
+            command: |
+              docker-compose -f docker-compose.prod.yml up -d --build
+              docker tag savannah:latest "$DOCKERHUB_USERNAME"/savannah:latest
+              docker tag project_nginx:latest "$DOCKERHUB_USERNAME"/project_nginx:latest
+              docker tag savannah:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/savannah:latest
+              docker tag project_nginx:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/project_nginx:latest
+              docker push $DOCKERHUB_USERNAME/savannah:latest
+              docker push $DOCKERHUB_USERNAME/project_nginx:latest
       - run:
           name: Push docker images to ECR
             command: docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/customer-order:latest
