@@ -101,7 +101,7 @@ This is a Django Rest Framework (DRF) project that provides a customer with a pl
 ## Testing
  - To run unit test with coverage, run:
     ```bash
-    docker-compose -f docker-compose.prod.yml exec web 
+    docker-compose -f docker-compose.prod.yml exec web coverage --source=savannah manage.py test
 
 ## Acknowledgments
 
