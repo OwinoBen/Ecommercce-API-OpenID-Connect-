@@ -32,7 +32,7 @@ jobs:
           command: |
             docker-compose -f docker-compose.prod.yml build
 
-  test-and-lint:
+  test-and-coverage:
     docker:
       - image: cimg/python:3.10.1
     parallelism: 4
@@ -53,9 +53,13 @@ jobs:
             docker-compose -f docker-compose.prod.yml up -d --build
       - run:
           name: running tests
-          command: docker-compose -f docker-compose.prod.yml exec web python manage.py test
+          command: |
+            docker-compose -f docker-compose.prod.yml exec web coverage --source=savannah manage.py test
+            coverage html
+    artifacts:
+      - htmlcov/
 
-  build-and-push-to-dockerhub:
+  build-and-push-to-ecr:
     docker:
       - image: cimg/python:3.10.1
     steps:
@@ -78,35 +82,12 @@ jobs:
             aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
             aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
             aws configure set default.region $AWS_DEFAULT_REGION
-            echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
             aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - run:
           name: Build, tag docker images and push to ECR
           command: |
             docker-compose -f docker-compose.prod.yml build
             docker-compose -f docker-compose.prod.yml push      
-
-  pull-and-test-dockerhub-image:
-    docker:
-      - image: cimg/python:3.10.1
-    steps:
-      - checkout
-      - setup_remote_docker:
-          version: 19.03.13
-          docker_layer_catching: true
-      - run: |
-          echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
-      - run:
-          name: Pulling dockerhub images
-          command: |
-            docker pull $DOCKERHUB_USERNAME/savannah:latest
-            docker pull $DOCKERHUB_USERNAME/project_nginx:latest
-      - run:
-          name: Testing DockerHub images
-          no_output_timeout: 30m
-          command: |
-            docker-compose -f docker-compose.prod.yml up -d
-            docker exec -it savannah-api python manage.py test
 
 workflows:
   build-and-test-workflow:
@@ -117,12 +98,9 @@ workflows:
             branches:
               only:
                 - main
-      - test-and-lint:
+      - test-and-coverage:
           requires:
             - create-docker-image
-      - build-and-push-to-dockerhub:
+      - build-and-push-to-ecr:
           requires:
-            - test-and-lint
-      - pull-and-test-dockerhub-image:
-          requires:
-            - build-and-push-to-dockerhub
+            - test-and-coverage
