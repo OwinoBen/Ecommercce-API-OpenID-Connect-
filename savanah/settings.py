@@ -112,6 +112,10 @@ AUTHENTICATION_BACKENDS = {
 # SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 # SESSION_CACHE_ALIAS = "default"
 
+TEST_OUTPUT_DIR = 'test-reports'
+COVERAGE_REPORT_HTML_OUTPUT_DIR = 'coverage-reports'
+COVERAGE_BADGE_TYPE = 'svg'
+COVERAGE_XML_VERSION = '1.0'
 CACHE_TTL = 60 * 1
 
 ROOT_URLCONF = 'savanah.urls'

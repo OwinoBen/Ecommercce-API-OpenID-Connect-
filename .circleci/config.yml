@@ -4,6 +4,7 @@ jobs:
   create-docker-image:
     docker:
       - image: cimg/python:3.10.1
+    parallelism: 2
     steps:
       - checkout
       - restore_cache:
@@ -34,6 +35,7 @@ jobs:
   test-and-lint:
     docker:
       - image: cimg/python:3.10.1
+    parallelism: 4
     steps:
       - checkout
       - run:
@@ -58,6 +60,7 @@ jobs:
       - image: cimg/python:3.10.1
     steps:
       - checkout
+      # Install docker-compose
       - run:
           name: Initializing docker compose
           command: |
@@ -69,6 +72,7 @@ jobs:
           docker_layer_caching: true
       - run:
           name: Authenticate with AWS ECR and DOCKERHUB
+          # install aws cli with pip to enable aws configuration
           command: |
             pip install awscli
             aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
@@ -77,24 +81,10 @@ jobs:
             echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
             aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - run:
-          name: Build and tag docker images
+          name: Build, tag docker images and push to ECR
           command: |
             docker-compose -f docker-compose.prod.yml build
-            docker-compose -f docker-compose.prod.yml push
-#            docker tag savannah:latest "$DOCKERHUB_USERNAME"/savannah:latest
-#            docker tag project_nginx:latest "$DOCKERHUB_USERNAME"/project_nginx:latest
-#            docker tag savannah:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/savannah:latest
-#            docker tag project_nginx:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/project_nginx:latest
-#            docker push $DOCKERHUB_USERNAME/savannah:latest
-#            docker push $DOCKERHUB_USERNAME/project_nginx:latest
-      - run:
-          name: Push docker images to ECR
-          command: |
-            aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-#            docker-compose -f docker-compose.prod.yml push
-#          command: docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/customer-order:latest
-            
-            
+            docker-compose -f docker-compose.prod.yml push      
 
   pull-and-test-dockerhub-image:
     docker:
