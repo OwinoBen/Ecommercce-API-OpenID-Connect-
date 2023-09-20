@@ -30,14 +30,14 @@ jobs:
       - run:
           name: Setting up docker
           command: |
-            docker-compose -f docker-compose.prod.yml build
+            docker-compose -f docker-compose.prod.yml up -d --build
       - run:
           name: running tests with coverage
           command: |
             docker-compose -f docker-compose.prod.yml exec web coverage run manage.py test
             docker-compose -f docker-compose.prod.yml exec web coverage html
       - store_artifacts:
-          path: htmlcov/
+          path: htmlcov
 
   build-and-push-to-ecr:
     docker:
