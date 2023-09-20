@@ -31,34 +31,13 @@ jobs:
           name: Setting up docker
           command: |
             docker-compose -f docker-compose.prod.yml build
-
-  test-and-coverage:
-    docker:
-      - image: cimg/python:3.10.1
-    parallelism: 4
-    steps:
-      - checkout
       - run:
-          name: Initializing docker compose
+          name: running tests with coverage
           command: |
-            curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o ~/docker-compose
-            chmod +x ~/docker-compose
-            sudo mv ~/docker-compose /usr/local/bin/docker-compose
-      - setup_remote_docker:
-          version: 19.03.13
-          docker_layer_caching: true
-      - run:
-          name: Setting up docker
-          command: |
-            docker-compose -f docker-compose.prod.yml up -d --build
-      - run:
-          name: running tests
-          command: |
-            docker-compose -f docker-compose.prod.yml exec web coverage --source=savannah manage.py test
+            docker-compose -f docker-compose.prod.yml exec web coverage manage.py test
             coverage html
       - store_artifacts:
           path: htmlcov/
-
 
   build-and-push-to-ecr:
     docker:
@@ -99,9 +78,6 @@ workflows:
             branches:
               only:
                 - main
-      - test-and-coverage:
-          requires:
-            - create-docker-image
       - build-and-push-to-ecr:
           requires:
-            - test-and-coverage
+            - create-docker-image
