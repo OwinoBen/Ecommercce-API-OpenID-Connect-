@@ -42,10 +42,11 @@ jobs:
           command: |
             mkdir -p /home/circleci/project/app/api/htmlcov
             docker cp $(docker-compose -f docker-compose.prod.yml ps -q web):/home/app/api/htmlcov /home/circleci/project/app/api/htmlcov
-#            docker cp savannah-api:/home/app/api/htmlcov $HOME/app/api/htmlcov
       - store_artifacts:
           path: /home/circleci/project/app/api/htmlcov
           destination: test_coverage_results
+      - store_test_results:
+          path: /home/circleci/project/app/api/htmlcov
 
   build-and-push-to-ecr:
     docker:
