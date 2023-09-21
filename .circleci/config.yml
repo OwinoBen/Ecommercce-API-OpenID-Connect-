@@ -41,7 +41,7 @@ jobs:
           name: copy the coverage results to circleci directory
           command: |
             mkdir -p $HOME/app/api/htmlcov
-            docker cp savannah-api:/home/app/api/htmlcov $HOME/app/api/htmlcov
+            docker-compose -f docker-compose.prod.yml exec web cp /home/app/api/htmlcov $HOME/app/api/htmlcov
             ls $HOME/app/api/htmlcov
       - store_artifacts:
           path: /app/api/htmlcov/
