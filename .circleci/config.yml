@@ -40,9 +40,8 @@ jobs:
       - run:
           name: copy the coverage results to circleci directory
           command: |
-            echo $HOME
-            mkdir -p /home/app/api/htmlcov
-            docker cp savannah-api:/home/app/api/htmlcov /home/app/api/htmlcov
+            mkdir -p $HOME/app/api/htmlcov
+            docker cp savannah-api:/home/app/api/htmlcov $HOME/app/api/htmlcov
       - store_artifacts:
           path: /home/app/api/htmlcov
           destination: test_coverage_results
