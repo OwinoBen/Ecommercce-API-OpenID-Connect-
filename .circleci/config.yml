@@ -35,9 +35,11 @@ jobs:
           name: running tests with coverage
           command: |
             docker-compose -f docker-compose.prod.yml exec web coverage run manage.py test
+            docker-compose -f docker-compose.prod.yml exec web ls /home/app/api/static
             docker-compose -f docker-compose.prod.yml exec web coverage html
       - store_artifacts:
-          path: htmlcov
+          path: /home/app/api/htmlcov
+          destination: test_coverage_results
 
   build-and-push-to-ecr:
     docker:
