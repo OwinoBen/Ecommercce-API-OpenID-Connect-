@@ -83,7 +83,7 @@ class TokenObtainView(viewsets.GenericViewSet):
         return Response(success_response(status_code=status.HTTP_200_OK, message_code="refresh_token",
                                          message=response), status=status.HTTP_200_OK)
 
-    @action(methods=["POST"], detail=False)
+    @action(methods=["GET"], detail=False)
     def callback(self, request):
         # Retrieve the authorization code from the request
         authorization_code = request.GET.get('code')
