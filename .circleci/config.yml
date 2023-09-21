@@ -44,7 +44,7 @@ jobs:
             docker cp savannah-api:/home/app/api/htmlcov $HOME/app/api/htmlcov
             ls -l $HOME/app/api/htmlcov
       - store_artifacts:
-          path: $HOME/app/api/htmlcov/
+          path: /app/api/htmlcov/
           destination: test_coverage_results
 
   build-and-push-to-ecr:
