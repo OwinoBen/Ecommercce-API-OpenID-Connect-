@@ -37,8 +37,12 @@ jobs:
             docker-compose -f docker-compose.prod.yml exec web coverage run manage.py test
             docker-compose -f docker-compose.prod.yml exec web coverage html
             docker-compose -f docker-compose.prod.yml exec web ls /home/app/api
+      - run:
+          name: copy the coverage results to circleci directory
+          command: |
+            docker cp savannah-api:/home/app/api/htmlcov /home/app/api/htmlcov
       - store_artifacts:
-          path: docker-compose -f docker-compose.prod.yml exec web /home/app/api/htmlcov/
+          path: /home/app/api/htmlcov
           destination: test_coverage_results
 
   build-and-push-to-ecr:
