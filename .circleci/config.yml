@@ -42,7 +42,7 @@ jobs:
           name: copy the coverage results to circleci directory
           command: |
             mkdir -p $HOME/app/api/htmlcov
-            docker-compose -f docker-compose.prod.yml cp web:/home/app/api/htmlcov $HOME/app/api/htmlcov
+            docker cp web:/home/app/api/htmlcov $HOME/app/api/htmlcov
       - store_artifacts:
           path: $HOME/app/api/htmlcov/
           destination: test_coverage_results
