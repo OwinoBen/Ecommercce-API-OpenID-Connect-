@@ -42,6 +42,7 @@ jobs:
           command: |
             mkdir -p $HOME/app/api/htmlcov
             docker cp savannah-api:/home/app/api/htmlcov $HOME/app/api/htmlcov
+            ls $HOME/app/api/htmlcov
       - store_artifacts:
           path: /app/api/htmlcov/
           destination: test_coverage_results
