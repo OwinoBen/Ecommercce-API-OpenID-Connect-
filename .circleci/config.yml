@@ -38,7 +38,7 @@ jobs:
             docker-compose -f docker-compose.prod.yml exec web coverage html
             docker-compose -f docker-compose.prod.yml exec web ls /home/app/api
       - store_artifacts:
-          path: /home/app/api/htmlcov/
+          path: docker-compose -f docker-compose.prod.yml exec web /home/app/api/htmlcov/
           destination: test_coverage_results
 
   build-and-push-to-ecr:
