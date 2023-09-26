@@ -25,6 +25,8 @@ services:
     volumes:
       - static_volume:/home/app/api/static
       - media_volume:/home/app/api/static/media
+    links:
+      - web:web
     depends_on:
       - web
 #    networks:
