@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-prod
-    command: gunicorn savanah.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn savanah.wsgi:application --bind 3.231.229.38:8000
 #    volumes:
 #      - static_volume:/home/app/api/static
 #      - media_volume:/home/app/api/static/media
