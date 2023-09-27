@@ -27,4 +27,4 @@ spec:
           image: savanah-nginx:latest
           ports:
             - name: server
-              containerPort: 1337
+              containerPort: 80
