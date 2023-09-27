@@ -30,7 +30,7 @@ class TestSetup(APITestCase):
             client_type=Application.CLIENT_CONFIDENTIAL,
             authorization_grant_type=Application.GRANT_OPENID_HYBRID,
             user=self.customer,
-            redirect_uris='http://3.231.229.38:8000/api/v1/auth/callback'
+            redirect_uris='http://127.0.0.1:8000/api/v1/auth/callback'
         )
         current_date = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
         self.token = AccessToken.objects.create(
