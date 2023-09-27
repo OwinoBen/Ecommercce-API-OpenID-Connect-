@@ -52,5 +52,6 @@ RUN chown -R app:app $APP_HOME
 #change the app user
 USER app
 
+EXPOSE 8000
 #run entrypoint.prod.sh
 ENTRYPOINT ["/home/app/api/entrypoint.prod.sh"]
