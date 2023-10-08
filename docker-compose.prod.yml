@@ -8,13 +8,8 @@ services:
       context: .
       dockerfile: Dockerfile-prod
     command: gunicorn savanah.wsgi:application --bind 0.0.0.0:8000
-    volumes:
-      - static_volume:/home/app/api/static
-      - media_volume:/home/app/api/static/media
-    ports:
-      - "8000:8000"
-#    expose:
-#      - "8000"
+    expose:
+      - "8000"
     env_file:
       - prod.env
 #    networks:

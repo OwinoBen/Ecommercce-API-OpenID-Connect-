@@ -1,5 +1,8 @@
+import json
+
 from rest_framework import serializers, exceptions, status
 from django.contrib.auth import get_user_model, authenticate
+from django.utils.html import escape
 
 from util.messages.response_SMS import send_sms_notification
 
@@ -30,12 +33,15 @@ class AuthSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError({'success': 0, "code": status.HTTP_400_BAD_REQUEST,
                                                        'message': 'Customer with the details exists.'})
             except User.DoesNotExist:
+                print(validated_data)
+                escaped_data = json.dumps(escape(validated_data))
+                print(escaped_data)
                 user = self.Meta.model.objects.create_user(**validated_data)
                 user.set_password(password)
                 user.save()
                 message = f'Dear {user.get_full_name()} , Thank you for joining us.'
                 send_sms_notification(message, user.phone)
-                return user
+                return escape(user)
 
     def update(self, instance, validated_data):
         """Update the Customer profile """
@@ -45,6 +51,7 @@ class AuthSerializer(serializers.ModelSerializer):
                 setattr(instance, key, value)
 
         instance.save(update_fields=updated_field)
+        return escape(instance)
 
 
 class ClientSerializer(serializers.Serializer):
