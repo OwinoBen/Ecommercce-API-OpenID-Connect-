@@ -1,69 +1,3 @@
-#FROM python:3.9.6-alpine as builder
-#
-#MAINTAINER Benson Opondo
-#WORKDIR /savannah_api
-#
-#ENV PYTHONDONTWRITEBYTECODE 1
-#ENV PYTHONUNBUFFERED 1
-#
-#RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev && apk add --update --no-cache rabbitmq-c-dev
-#RUN apk add nginx
-#
-#RUN pip install --upgrade pip
-#
-#COPY . .
-## install dependencies
-#COPY ./requirements.txt .
-#RUN pip --no-cache wheel --no-deps --wheel-dir /savannah_api/wheels -r requirements.txt
-#
-#FROM python:3.9.6-alpine
-#
-## create directory for the app user
-#RUN mkdir -p /home/app
-#
-##create the app user (non root user)
-#RUN  addgroup -S app && adduser -S app -G app
-#
-##create directories
-#
-#ENV HOME=/home/app
-#ENV APP_HOME=/home/app/api
-#RUN mkdir -p $APP_HOME/staticfiles
-#RUN mkdir -p $APP_HOME/mediafiles
-#RUN mkdir -p $APP_HOME
-#
-#WORKDIR $APP_HOME
-#
-#VOLUME ["$APP_HOME/media/", "$APP_HOME/logs/", "$APP_HOME/static/"]
-##install dependencies
-#RUN apk update && apk add libpq #c library for connecting to postgresql
-#COPY --from=builder /savannah_api/wheels /wheels
-#COPY --from=builder /savannah_api/requirements.txt .
-#RUN pip install --no-cache /wheels/*
-#
-#
-#COPY ./nginx/nginx.conf /etc/nginx/sites-available/
-#RUN ln -s /etc/nginx/sites-available/nginx.conf /etc/nginx/sites-enabled
-#RUN echo "daemon off;" >> /etc/nginx/nginx.conf
-#
-##copy entrypoint.sh
-#COPY ./entrypoint.prod.sh .
-#RUN sed -i 's/\r$//g' $APP_HOME/entrypoint.prod.sh
-#RUN chmod +x  $APP_HOME/entrypoint.prod.sh
-#
-##copy project
-#COPY . $APP_HOME
-#
-##chown all the files to the app user
-#RUN chown -R app:app $APP_HOME
-#
-##change the app user
-#USER app
-#
-##run entrypoint.prod.sh
-#ENTRYPOINT ["/home/app/api/entrypoint.prod.sh"]
-
-
 # Use Ubuntu as the base image
 FROM ubuntu:20.04
 
@@ -104,9 +38,6 @@ RUN pip3 install -r requirements.txt
 # create directory for the app user
 RUN mkdir -p /home/app
 
-#create the app user (non root user)
-RUN  #addgroup --system app && adduser --system app --gid app
-
 # Create directories
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/api
@@ -132,11 +63,6 @@ RUN chmod +x $APP_HOME/entrypoint.prod.sh
 # Copy the project files
 COPY . $APP_HOME
 
-# Change ownership to the app user
-#RUN chown -R app:app $APP_HOME
-
-# Switch to the app user
-#USER app
 EXPOSE 8000
 # Run entrypoint script
 ENTRYPOINT ["/home/app/api/entrypoint.prod.sh"]
