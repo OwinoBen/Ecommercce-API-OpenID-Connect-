@@ -1,26 +1,19 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  api:
-    image: backend
+  web:
+    image: 535793255376.dkr.ecr.us-east-1.amazonaws.com/customer-order:latest
     container_name: savannah-api
     build:
       context: .
-      dockerfile: Dockerfile
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/usr/src/app/
-    ports:
-      - "8000:8000"
+      dockerfile: Dockerfile-prod
+    command: gunicorn savanah.wsgi:application --bind 0.0.0.0:8000
+    expose:
+      - "8000"
     env_file:
-      - ./.env
-    depends_on:
-      - db
-    links:
-      - db:db
-    networks:
-      - savannah
-
+      - prod.env
+#    networks:
+#      - savannah
   db:
     image: postgres:13
     container_name: api-db
@@ -37,7 +30,21 @@ services:
       - "5432"
     networks:
       - savannah
+  nginx:
+    image: 535793255376.dkr.ecr.us-east-1.amazonaws.com/ngnix:latest
+    build: ./nginx
+    ports:
+      - "1337:80"
+    volumes:
+      - static_volume:/home/app/api/static
+      - media_volume:/home/app/api/static/media
+    depends_on:
+      - web
+#    networks:
+#      - savannah
+
 volumes:
-  database-data:
-networks:
-  savannah:
+  static_volume:
+  media_volume:
+#networks:
+#  savannah:

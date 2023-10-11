@@ -57,7 +57,7 @@ python-dotenv==1.0.0
 python-jose==3.3.0
 python3-openid==3.2.0
 pytz==2023.3.post1
-PyYAML==6.0.1
+# PyYAML==6.0.1
 redis==5.0.0
 referencing==0.30.2
 requests==2.31.0

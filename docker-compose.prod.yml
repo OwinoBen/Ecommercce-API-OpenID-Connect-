@@ -7,28 +7,30 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-prod
-    command: gunicorn savanah.wsgi:application --bind 0.0.0.0:8000
-    expose:
-      - "8000"
+#    command: gunicorn savanah.wsgi:application --bind 0.0.0.0:8000
+    ports:
+      - "8000:80"
+#    expose:
+#      - "8000"
     env_file:
       - prod.env
 #    networks:
 #      - savannah
-  nginx:
-    image: 535793255376.dkr.ecr.us-east-1.amazonaws.com/ngnix:latest
-    build: ./nginx
-    ports:
-      - "1337:80"
-    volumes:
-      - static_volume:/home/app/api/static
-      - media_volume:/home/app/api/static/media
-    depends_on:
-      - web
+#  nginx:
+#    image: 535793255376.dkr.ecr.us-east-1.amazonaws.com/ngnix:latest
+#    build: ./nginx
+#    ports:
+#      - "1337:80"
+#    volumes:
+#      - static_volume:/home/app/api/static
+#      - media_volume:/home/app/api/static/media
+#    depends_on:
+#      - web
 #    networks:
 #      - savannah
 
-volumes:
-  static_volume:
-  media_volume:
+#volumes:
+#  static_volume:
+#  media_volume:
 #networks:
 #  savannah:
