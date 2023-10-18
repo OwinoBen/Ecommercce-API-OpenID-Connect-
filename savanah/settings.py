@@ -66,6 +66,7 @@ LOGIN_URL = 'rest_framework:login'
 LOGOUT_REDIRECT_URL = 'rest_framework:logout'
 
 MIDDLEWARE = [
+    'csp.middleware.CSPMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -78,7 +79,12 @@ MIDDLEWARE = [
 ]
 
 # prevent cross-site scripting attacks
-c = ("'self'",)
+
+CSP_IMG_SRC = ("'self'",)
+
+CSP_STYLE_SRC = ("'self'",)
+
+CSP_SCRIPT_SRC = ("'self'",)
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

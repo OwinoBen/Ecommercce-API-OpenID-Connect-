@@ -16,7 +16,7 @@ class TestSetup(APITestCase):
             "username": self.fake.simple_profile()['username'],
             "first_name": self.fake.first_name(),
             "last_name": self.fake.last_name(),
-            "phone": "0790232329"
+            "phone": "0746180701"
         }
         self.register_url = reverse("accounts:auth-list", args=())
 

@@ -15,6 +15,9 @@ exec gunicorn savanah.wsgi:application \
     --log-file=/home/app/logs/gunicorn.log \
     --access-logfile=/home/app/logs/access.log &
 
+echo Starting RabbitMq
+exec service start rabbitmq &
+
 echo Starting nginx
 exec service nginx start \
     "$@"
